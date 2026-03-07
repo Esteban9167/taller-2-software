@@ -11,24 +11,12 @@
         <result property="descripcion" column="descripcion"/>
     </resultMap>
 
-    <!-- ResultMap para Item -->
-    <resultMap id="ItemResult" type="Item">
-        <id property="id" column="id"/>
-        <result property="nombre" column="nombre"/>
-        <result property="descripcion" column="descripcion"/>
-        <result property="fechaLanzamiento" column="fechalanzamiento"/>
-        <result property="tarifaxDia" column="tarifaxdia"/>
-        <result property="formatoRenta" column="formatorenta"/>
-        <result property="genero" column="genero"/>
-        <association property="tipo" javaType="TipoItem" resultMap="TipoItemResult" columnPrefix="ti_"/>
-    </resultMap>
-
     <!-- ResultMap para ItemRentado -->
     <resultMap id="ItemRentadoResult" type="ItemRentado">
         <id property="id" column="id"/>
         <result property="fechainiciorenta" column="fechainiciorenta"/>
         <result property="fechafinrenta" column="fechafinrenta"/>
-        <association property="item" javaType="Item" resultMap="ItemResult" columnPrefix="it_"/>
+        <association property="item" javaType="Item" resultMap="edu.unisabana.dyas.sampleprj.dao.mybatis.mappers.ItemMapper.ItemResult" columnPrefix="it_"/>
     </resultMap>
 
     <!-- ResultMap para Cliente, con colección de ItemsRentados -->
@@ -68,5 +56,39 @@
             LEFT JOIN VI_ITEMS AS i ON ir.ITEMS_id = i.id
             LEFT JOIN VI_TIPOITEM AS ti ON i.TIPOITEM_id = ti.id
     </select>
+
+    <!-- Consulta para cargar un solo cliente por documento -->
+    <select id="consultarCliente" parameterType="map" resultMap="ClienteResult">
+        SELECT
+            c.nombre            AS cli_nombre,
+            c.documento         AS cli_documento,
+            c.telefono          AS cli_telefono,
+            c.direccion         AS cli_direccion,
+            c.email             AS cli_email,
+            c.vetado            AS cli_vetado,
+            ir.ITEMS_id         AS ir_id,
+            strftime('%Y-%m-%d %H:%M:%f', ir.fechainiciorenta) AS ir_fechainiciorenta,
+            strftime('%Y-%m-%d %H:%M:%f', ir.fechafinrenta)    AS ir_fechafinrenta,
+            i.id                AS it_id,
+            i.nombre            AS it_nombre,
+            i.descripcion       AS it_descripcion,
+            strftime('%Y-%m-%d %H:%M:%f', i.fechalanzamiento)  AS it_fechalanzamiento,
+            i.tarifaxdia        AS it_tarifaxdia,
+            i.formatorenta      AS it_formatorenta,
+            i.genero            AS it_genero,
+            ti.id               AS ti_id,
+            ti.descripcion      AS ti_descripcion
+        FROM VI_CLIENTES AS c
+            LEFT JOIN VI_ITEMRENTADO AS ir ON c.documento = ir.CLIENTES_documento
+            LEFT JOIN VI_ITEMS AS i ON ir.ITEMS_id = i.id
+            LEFT JOIN VI_TIPOITEM AS ti ON i.TIPOITEM_id = ti.id
+        WHERE c.documento = #{idcli}
+    </select>
+
+    <!-- Insert para agregar un item rentado a un cliente -->
+    <insert id="agregarItemRentadoACliente">
+        INSERT INTO VI_ITEMRENTADO (CLIENTES_documento, ITEMS_id, fechainiciorenta, fechafinrenta)
+        VALUES (#{id}, #{idit}, #{fechainicio}, #{fechafin})
+    </insert>
 
 </mapper>

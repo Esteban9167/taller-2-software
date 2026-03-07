@@ -20,6 +20,7 @@ package edu.unisabana.dyas.samples.services.client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Date;
 import java.util.List;
 import java.sql.SQLException;
 import org.apache.ibatis.io.Resources;
@@ -28,7 +29,10 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import edu.unisabana.dyas.sampleprj.dao.mybatis.mappers.ClienteMapper;
+import edu.unisabana.dyas.sampleprj.dao.mybatis.mappers.ItemMapper;
 import edu.unisabana.dyas.samples.entities.Cliente;
+import edu.unisabana.dyas.samples.entities.Item;
+import edu.unisabana.dyas.samples.entities.TipoItem;
 
 /**
  *
@@ -69,10 +73,37 @@ public class MyBatisExample {
         // Crear el mapper y usarlo: 
         ClienteMapper cm = sqlss.getMapper(ClienteMapper.class);
 
+        System.out.println("Clientes antes de agregar:");
         List<Cliente> clientes = cm.consultarClientes();
         for (Cliente c : clientes) {
             System.out.println(c);
         }
+
+        // Agregar un item rentado a un cliente
+        cm.agregarItemRentadoACliente(123456789, 2, new java.sql.Date(System.currentTimeMillis()), new java.sql.Date(System.currentTimeMillis() + 86400000L)); // Agregar item 2 al cliente 123456789
+
+        System.out.println("\nClientes después de agregar:");
+        clientes = cm.consultarClientes();
+        for (Cliente c : clientes) {
+            System.out.println(c);
+        }
+
+        // Insertar un nuevo item
+        ItemMapper im = sqlss.getMapper(ItemMapper.class);
+        TipoItem tipo = new TipoItem(1, "Electrónico");
+        Item nuevoItem = new Item(tipo, 4, "Nuevo Item", "Descripción del nuevo item", new java.sql.Date(System.currentTimeMillis()), 3000, "Diario", "Nuevo Género");
+        im.insertarItem(nuevoItem);
+
+        System.out.println("\nItems después de insertar:");
+        List<Item> items = im.consultarItems();
+        for (Item i : items) {
+            System.out.println(i);
+        }
+
+        System.out.println("\nConsultar item específico (id=1):");
+        Item itemEspecifico = im.consultarItem(1);
+        System.out.println(itemEspecifico);
+        
 
         sqlss.commit();
         sqlss.close();
