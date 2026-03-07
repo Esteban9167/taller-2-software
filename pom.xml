@@ -34,6 +34,12 @@
             <artifactId>mybatis</artifactId>
             <version>3.4.5</version> <!-- La versión puede variar -->
         </dependency>
+        <!-- Driver JDBC para SQLite -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.46.0.0</version>
+        </dependency>
 
     </dependencies>
     

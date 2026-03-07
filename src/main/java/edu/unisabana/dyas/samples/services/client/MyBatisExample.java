@@ -20,11 +20,15 @@ package edu.unisabana.dyas.samples.services.client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.sql.SQLException;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+
+import edu.unisabana.dyas.sampleprj.dao.mybatis.mappers.ClienteMapper;
+import edu.unisabana.dyas.samples.entities.Cliente;
 
 /**
  *
@@ -62,20 +66,17 @@ public class MyBatisExample {
 
         SqlSession sqlss = sessionfact.openSession();
 
-        
-        //Crear el mapper y usarlo: 
-        //ClienteMapper cm=sqlss.getMapper(ClienteMapper.class)
-        //cm...
-        
-        
-        
+        // Crear el mapper y usarlo: 
+        ClienteMapper cm = sqlss.getMapper(ClienteMapper.class);
+
+        List<Cliente> clientes = cm.consultarClientes();
+        for (Cliente c : clientes) {
+            System.out.println(c);
+        }
+
         sqlss.commit();
-        
-        
         sqlss.close();
 
-        
-        
     }
 
 
